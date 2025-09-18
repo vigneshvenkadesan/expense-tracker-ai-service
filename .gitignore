@@ -1,0 +1,20 @@
+# Node modules
+node_modules/
+package-lock.json
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE-specific files
+.vscode/
+.idea/
+
+.vercel
