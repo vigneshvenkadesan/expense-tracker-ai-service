@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import fetch from "node-fetch";
 import JSON5 from "json5";
 import Cors from "cors";
+import Constants from "../utils/constants";
 
 // Initialize CORS middleware
 const cors = Cors({
@@ -53,13 +54,17 @@ function replaceCurrentMonthPlaceholders(obj) {
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
 
+  // Convert object to JSON string
   const jsonStr = JSON.stringify(obj)
+    // Replace placeholders
     .replace(/%Y/g, year)
     .replace(/%m/g, month)
     .replace(/%d/g, day);
 
+  // Parse back to object
   return JSON.parse(jsonStr);
 }
+
 
 // --- Inject userId into all queries ---
 function injectUserId(filterOrAgg, userId) {
@@ -197,38 +202,9 @@ export default async function (req, res) {
   if (!question || !userId)
     return res.status(400).json({ error: "Question and userId are required" });
 
-  const systemPrompt = `You are a MongoDB assistant.
-Your task is to convert natural language questions into MongoDB queries.
-
-Schema: 
-- amount, reason, category, date ("dd/mm/yyyy"), paymentMethod, type, userId
-
-Rules:
-1. Filters: Always use $regex for reason, case-insensitive.
-2. Aggregations: Use $group, $sum, $avg when needed.
-3. Dates: 
-   - Always in "dd/mm/yyyy".
-   - If "current month" is asked, use placeholders "%Y", "%m", "%d".
-   - If no explicit date range is mentioned, assume current month.
-4. Output: ONLY valid JSON. Do not include explanations or text.
-
-Examples:
-Q: "Show milk expenses between 02/03/2025 and 17/09/2025"
-A: {
-  "$and": [
-    { "reason": { "$regex": "milk", "$options": "i" } },
-    { "date": { "$gte": "02/03/2025", "$lte": "17/09/2025" } }
-  ]
-}
-
-Q: "Total spent per payment method this month"
-A: [
-  { "$match": { "date": { "$gte": "01/%m/%Y", "$lte": "%d/%m/%Y" } } },
-  { "$group": { "_id": "$paymentMethod", "total": { "$sum": "$amount" } } }
-]`;
 
   try {
-    let filter = await handler.getMongoFilterFromLLM(question, systemPrompt);
+    let filter = await handler.getMongoFilterFromLLM(question, Constants.queryLLMPrompt);
     console.log(filter)
     if (filter.error) return res.status(500).json(filter);
 

@@ -85,6 +85,7 @@ class MongoQueryHandler {
 You will summarize only the provided dataset. 
 Do NOT include or invent information about any entries not present in the dataset.
 
+Add everything in summary along with the below structure
 Return a JSON object with:
 - summary
 - totalSpending
