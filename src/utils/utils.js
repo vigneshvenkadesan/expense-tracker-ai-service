@@ -63,7 +63,7 @@ function injectCurrentMonthIfMissing(filter) {
  */
 function injectUserId(filterOrAgg, userId) {
   const userFilter = { userId }; // ensure it's an object
-   filterOrAgg = {...filterOrAgg, userId};
+
   if (Array.isArray(filterOrAgg)) {
     // aggregation pipeline
     const matchStage = filterOrAgg.find(stage => stage.$match);
@@ -73,9 +73,11 @@ function injectUserId(filterOrAgg, userId) {
       // no $match stage, add one at the beginning
       filterOrAgg.unshift({ $match: userFilter });
     }
+    
     return filterOrAgg;
   } else {
     // regular filter object
+       filterOrAgg = {...filterOrAgg, userId};
     return { $and: [filterOrAgg] };
   }
 }
