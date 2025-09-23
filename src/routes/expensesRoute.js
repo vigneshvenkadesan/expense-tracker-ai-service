@@ -7,7 +7,8 @@ const {
   replaceCurrentMonthPlaceholders,
 } = require("../utils/utils.js");
 const MongoQueryHandler = require("../services/queryHandler.js");
-const {  queryLLMPrompt } = require("../utils/constants.js");
+const { queryLLMPrompt } = require("../utils/constants.js");
+const LLMHandler = require("../services/llmHandler.js");
 const router = express.Router();
 const handler = new MongoQueryHandler();
 
@@ -43,8 +44,25 @@ router.post("/query", async (req, res) => {
       answer: results.length
         ? "✅ Expenses fetched successfully"
         : "⚠️ No matching expenses found",
-      summary
+      summary,
     });
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Failed to process request", details: err.message });
+  }
+});
+
+router.post("/summary", async (req, res) => {
+  let { query } = req.body;
+  try {
+    query = `Analyse the following data points and provide a concise summary in exactly 6 lines. Focus on meaningful insights from the data and ignore income vs expenses. 
+this is no dicrepency in data , everything is in INR, give some tips as well  ${JSON.stringify(query)}
+    
+    Return reponse in json format`
+    const response = await LLMHandler.queryLLM(query);
+
+    res.status(200).json(response);
   } catch (err) {
     res
       .status(500)
