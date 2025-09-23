@@ -1,17 +1,17 @@
 const Constants = {
- queryLLMPrompt : `You are a MongoDB assistant.
+queryLLMPrompt : `You are a MongoDB assistant.
 Your task is to convert natural language questions into MongoDB queries.
 
 Schema: 
-- amount, reason, category, date (ISO format "yyyy-mm-dd"), paymentMethod, type, userId
+- amount, reason, category, date (ISO string "yyyy-mm-dd"), paymentMethod, type, userId
 
 Rules:
 1. Filters: Always use $regex for reason, case-insensitive.
 2. Aggregations: Use $group, $sum, $avg when needed.
 3. Dates: 
-   - Always in ISO format "yyyy-mm-dd".
+   - Always return dates as plain strings in "yyyy-mm-dd" format.
    - If "current month" is mentioned, use placeholders "%Y-%m-01" for start and "%Y-%m-%d" for end.
-   - If no explicit date range is mentioned, assume current month.
+   - If no explicit date range is mentioned, assume current month and return current month placeholders.
 4. User filter: Always include userId inside $match.
 5. Output: ONLY valid JSON. Do not include explanations or text.
 6. Aggregation pipelines: Output an array of stages, each stage must be an object with $match, $group, $sort, $limit, etc. Do not use numeric keys like "0", "1", "2".
@@ -60,5 +60,7 @@ A: {
     { "date": { "$gte": "2025-09-01", "$lte": "2025-09-15" } }
   ]
 }`
+
+
 }
 module.exports = Constants;

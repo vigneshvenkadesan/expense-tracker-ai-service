@@ -20,11 +20,11 @@ router.post("/query", async (req, res) => {
   try {
     let filter = await handler.getMongoFilterFromLLM(question, queryLLMPrompt);
 
-    // 1️⃣ Replace placeholders (if LLM used "%Y/%m/%d")
+    // // 1️⃣ Replace placeholders (if LLM used "%Y/%m/%d")
     filter = replaceCurrentMonthPlaceholders(filter);
 
-    // 2️⃣ Inject current month if no date was returned
-    filter = injectCurrentMonthIfMissing(filter);
+    // // 2️⃣ Inject current month if no date was returned
+    // filter = injectCurrentMonthIfMissing(filter);
 
     // 3️⃣ Inject userId
     filter = injectUserId(filter, userId);

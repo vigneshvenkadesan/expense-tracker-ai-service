@@ -10,13 +10,32 @@ function replaceCurrentMonthPlaceholders(obj) {
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
 
+  // First replace placeholders into YYYY-MM-DD strings
   const jsonStr = JSON.stringify(obj)
     .replace(/%Y/g, year)
     .replace(/%m/g, month)
     .replace(/%d/g, day);
 
-  return JSON.parse(jsonStr);
+  // Parse back to JS object
+  const replacedObj = JSON.parse(jsonStr);
+
+  // Recursively walk the object and convert date strings → Date objects
+  function reviveDates(val) {
+    if (Array.isArray(val)) {
+      return val.map(reviveDates);
+    } else if (val && typeof val === "object") {
+      return Object.fromEntries(
+        Object.entries(val).map(([k, v]) => [k, reviveDates(v)])
+      );
+    } else if (typeof val === "string" && /^\d{4}-\d{2}-\d{2}$/.test(val)) {
+      return new Date(val); // convert YYYY-MM-DD into Date
+    }
+    return val;
+  }
+
+  return reviveDates(replacedObj);
 }
+
 
 /**
  * Ensures that a query/filter has a date range.

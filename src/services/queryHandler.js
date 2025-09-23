@@ -88,16 +88,11 @@ Do NOT include or invent information about any entries not present in the datase
 Add everything in summary along with the below structure
 Return a JSON object with:
 - summary
-- totalSpending
-- averagePerDay
-- averagePerCategory
-- topCategories
-- topPaymentMethods
-- highestExpense
-- insights
 
 Data: ${JSON.stringify(filteredResults, null, 2)}
-User Question: ${question}`;
+User Question: ${question} provide additional info as required in the question
+
+Everything in INR`;
 
     // Step 3: Call LLM
     try {
@@ -115,28 +110,14 @@ let cleaned = rawSummary
       } catch (err) {
         // Fallback: minimal UI-friendly structure
         jsonSummary = {
-          summary: cleaned,
-          totalSpending: 0,
-          averagePerDay: 0,
-          averagePerCategory: {},
-          topCategories: [],
-          topPaymentMethods: [],
-          highestExpense: null,
-          insights: [],
+          summary: cleaned
         };
       }
 
       return jsonSummary;
     } catch (err) {
       return {
-        summary: "Failed to generate summary.",
-        totalSpending: 0,
-        averagePerDay: 0,
-        averagePerCategory: {},
-        topCategories: [],
-        topPaymentMethods: [],
-        highestExpense: null,
-        insights: [],
+        summary: "Failed to generate summary."
       };
     }
   }
